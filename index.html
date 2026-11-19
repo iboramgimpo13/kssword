@@ -43,7 +43,7 @@ tr[data-i]{cursor:pointer}td button{padding:.35rem .7rem;font-size:.9rem}
 @media (max-aspect-ratio:1/1){.st{grid-template-columns:1fr;grid-template-rows:38% 1fr}.pic{order:-1}}
 </style></head><body><div id="app"></div>
 <script>
-const SB_URL='https://hjozecorzlyjcsrwucdy.supabase.co/rest/v1/', SB_KEY='sb_publishable_rNN-YOXdTYcd-FGH4VS_oA_uLDCJSyu';
+const SB_URL='https://YOUR-PROJECT.supabase.co', SB_KEY='YOUR-ANON-KEY';
 const sb=supabase.createClient(SB_URL,SB_KEY);
 const $=s=>document.querySelector(s),sh=a=>[...a].sort(()=>Math.random()-.5),pad=n=>String(n).padStart(4,'0');
 const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
@@ -70,7 +70,7 @@ const blank=(t,w)=>esc(t).replace(new RegExp('\\b('+vr(w.word).sort((a,b)=>b.len
 
 // ---------- 로그인
 function login(msg=''){go(`<div class=ctr><h1>영단어 학습</h1><input id=em placeholder="아이디" autocomplete=username autocapitalize=none><input id=pw type=password placeholder="비밀번호" autocomplete=current-password><button id=li class=b>로그인</button><div style="color:var(--red)">${msg}</div></div>`);
-$('#li').onclick=async()=>{const{error}=await sb.auth.signInWithPassword({email:$('#em').value.trim().toLowerCase()+'@student.local',password:$('#pw').value});error?login('아이디 또는 비밀번호가 맞지 않습니다.'):enter()}}
+$('#li').onclick=async()=>{if(SB_URL.includes('YOUR-')||SB_KEY.includes('YOUR-'))return login('index.html에 Supabase 주소와 키를 아직 넣지 않았습니다.');const{error}=await sb.auth.signInWithPassword({email:$('#em').value.trim().toLowerCase()+'@student.local',password:$('#pw').value});error?login('로그인 실패: '+error.message):enter()}}
 async function enter(){const{data,error}=await sb.from('words').select('no,word,meaning,definition,example').order('no').limit(2000);
 if(error||!data?.length)return login('단어를 불러오지 못했습니다. '+(error?.message||''));W=data;build();const{data:{user}}=await sb.auth.getUser();const{data:p}=await sb.from('profiles').select('*').eq('id',user.id).single();ME={id:user.id,...p};ME.is_admin?admin():home()}
 
