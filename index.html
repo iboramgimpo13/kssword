@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>영단어 학습</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--bg:#eef3f9;--ink:#0f1b33;--blue:#1558d6;--red:#d9263a;--ok:#1f9d55;--line:#c9d6ea}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{font-family:system-ui,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:var(--bg);color:var(--ink)}
+button{font:inherit;cursor:pointer;border-radius:12px;padding:.8rem 1.3rem;border:2px solid var(--blue)}
+.b{background:var(--blue);color:#fff}.b2{background:#fff;color:var(--blue)}
+.b:focus-visible,.b2:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.hid{display:none}.ok{background:var(--ok)!important;color:#fff!important;border-color:var(--ok)!important}
+.no{background:var(--red)!important;color:#fff!important;border-color:var(--red)!important}
+.ctr{min-height:100dvh;display:grid;place-content:center;gap:1rem;text-align:center;padding:1.5rem}
+.ctr input{font:inherit;padding:.8rem;border:2px solid var(--line);border-radius:10px;width:min(320px,80vw)}
+.hm{max-width:720px;margin:0 auto;padding:1rem}
+.hm header{display:flex;justify-content:space-between;align-items:center}
+.dy{background:#fff;border-radius:16px;margin:.8rem 0;padding:.8rem;border:1px solid var(--line)}
+.dh{display:flex;gap:.6rem}.dt{flex:1;text-align:left;background:#fff;color:var(--ink);border-color:var(--line);font-weight:700;font-size:1.15rem}
+.wl{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.5rem;margin-top:.7rem}
+.wc{background:#f7faff;color:var(--ink);border-color:var(--line);text-align:left;padding:.5rem .7rem}
+.wc b{color:var(--blue);display:block}.wc small{opacity:.75}
+.st{display:grid;grid-template-columns:1fr 1fr;height:100dvh}
+.txt{padding:clamp(1rem,3vw,2.5rem);display:flex;flex-direction:column;overflow:auto}
+.bw{color:var(--blue);font-weight:800;font-size:clamp(2.8rem,8vw,5.5rem);line-height:1.1;cursor:pointer;word-break:break-word}
+.bw.ko{font-size:clamp(1.6rem,4vw,2.6rem);color:var(--ink)}
+.txt p{font-size:clamp(1.2rem,2.5vw,1.9rem);line-height:1.65;margin:.8rem 0}
+.rw{color:var(--red);font-weight:700;border-bottom:2px dotted var(--red);cursor:pointer}
+.lock .rw{pointer-events:none}
+.nav{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:.6rem;padding-top:1rem}
+.pic{background:#dfe8f5;display:grid;place-items:center;overflow:hidden}.pic img{width:100%;height:100%;object-fit:contain}
+.pop{position:fixed;inset:0;background:rgba(15,27,51,.6);display:grid;place-items:center;z-index:9}
+.pop .card{background:#fff;border-radius:16px;padding:.8rem;width:min(80vw,380px);text-align:center}
+.pop img{width:100%;border-radius:10px;cursor:pointer}
+.qz{max-width:760px;margin:0 auto;padding:1.2rem;display:grid;gap:1rem;justify-items:center;text-align:center}
+.qi{width:min(100%,420px);aspect-ratio:1;object-fit:contain;background:#dfe8f5;border-radius:16px}
+.qt{font-size:1.35rem;line-height:1.7;margin:0}.bl{color:var(--blue);letter-spacing:.05em}
+.op,.mt{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;width:100%}.op button,.mt button{font-size:1.15rem;min-height:3.4rem}
+.fm{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.6rem}.fm input{font:inherit;padding:.7rem;border:2px solid var(--line);border-radius:10px;flex:1;min-width:130px}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;margin-top:.7rem}td,th{padding:.55rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+tr[data-i]{cursor:pointer}td button{padding:.35rem .7rem;font-size:.9rem}
+@media (max-aspect-ratio:1/1){.st{grid-template-columns:1fr;grid-template-rows:38% 1fr}.pic{order:-1}}
+</style></head><body><div id="app"></div>
+<script>
+const SB_URL='https://hjozecorzlyjcsrwucdy.supabase.co/rest/v1/', SB_KEY='sb_publishable_rNN-YOXdTYcd-FGH4VS_oA_uLDCJSyu';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+const $=s=>document.querySelector(s),sh=a=>[...a].sort(()=>Math.random()-.5),pad=n=>String(n).padStart(4,'0');
+const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const pub=p=>sb.storage.from('media').getPublicUrl(p).data.publicUrl;
+const fn=w=>w.word.replace(/[\\/:*?"<>|]/g,'').replace(/\s+/g,' ').trim();
+const img=w=>pub(`img/${pad(w.no)}.jpg`),aud=(w,k)=>pub(`audio/${pad(w.no)} ${fn(w)}_${k}.mp3`);
+const hide="this.style.visibility='hidden'";
+let W=[],vmap,RX,S,Z,cid,tok=0,ME,D;const track=()=>sb.from('progress').upsert({user_id:ME.id,day:S.d,pos:S.pos+1,updated_at:new Date().toISOString()}).then(()=>{});const A=new Audio();
+function say(u,done){const t=++tok;A.pause();let i=0;const nx=()=>{if(t!=tok)return;if(i>=u.length){done&&done();return}A.src=u[i++];A.onended=nx;A.onerror=nx;A.play().catch(nx)};nx()}
+const go=h=>{tok++;A.pause();$('#app').innerHTML=h};
+const dw=d=>W.filter(w=>Math.ceil(w.no/30)==d);
+// 단어 변형형태(복수, -ed, -ing, -er, -ly 등)
+function vr(w){w=w.toLowerCase();const s=new Set([w]);if(w.includes(' '))return[...s];const b=w.slice(0,-1),l=w.slice(-1);
+['s','es','ed','d','ing','er','ers','ly'].forEach(x=>s.add(w+x));
+if(w.endsWith('e')){s.add(b+'ing');s.add(b+'er')}
+if(/[^aeiou]y$/.test(w)){['ies','ied','ily','ier'].forEach(x=>s.add(b+x))}
+s.add(w+l+'ed');s.add(w+l+'ing');s.add(w+l+'er');return[...s]}
+function build(){vmap=new Map();W.forEach(w=>vmap.has(w.word.toLowerCase())||vmap.set(w.word.toLowerCase(),w.no));
+W.forEach(w=>vr(w.word).forEach(v=>vmap.has(v)||vmap.set(v,w.no)));
+const ks=[...vmap.keys()].sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
+RX=new RegExp('\\b('+ks.join('|')+')\\b','gi')}
+const red=(t,w)=>{const s=new Set(vr(w.word));return esc(t).replace(RX,m=>{const k=m.toLowerCase();if(s.has(k))return m;const n=vmap.get(k);return n==null?m:`<span class=rw data-n="${n}">${m}</span>`})};
+const blank=(t,w)=>esc(t).replace(new RegExp('\\b('+vr(w.word).sort((a,b)=>b.length-a.length).join('|')+')\\b','gi'),'<b class=bl>_____</b>');
+
+// ---------- 로그인
+function login(msg=''){go(`<div class=ctr><h1>영단어 학습</h1><input id=em placeholder="아이디" autocomplete=username autocapitalize=none><input id=pw type=password placeholder="비밀번호" autocomplete=current-password><button id=li class=b>로그인</button><div style="color:var(--red)">${msg}</div></div>`);
+$('#li').onclick=async()=>{const{error}=await sb.auth.signInWithPassword({email:$('#em').value.trim().toLowerCase()+'@student.local',password:$('#pw').value});error?login('아이디 또는 비밀번호가 맞지 않습니다.'):enter()}}
+async function enter(){const{data,error}=await sb.from('words').select('no,word,meaning,definition,example').order('no').limit(2000);
+if(error||!data?.length)return login('단어를 불러오지 못했습니다. '+(error?.message||''));W=data;build();const{data:{user}}=await sb.auth.getUser();const{data:p}=await sb.from('profiles').select('*').eq('id',user.id).single();ME={id:user.id,...p};ME.is_admin?admin():home()}
+
+// ---------- 목록
+function home(){const n=Math.ceil(W.length/30);
+go(`<div class=hm><header><h1>영단어</h1><span>${ME.is_admin?'<button id=ab class=b2>관리자</button> ':''}<button id=lo class=b2>로그아웃</button></span></header>${[...Array(n)].map((_,i)=>`<section class=dy><div class=dh><button class=dt data-d=${i+1}>${i+1}일차</button><button class=b data-s=${i+1}>학습시작</button></div><div class="wl hid" id=d${i+1}>${dw(i+1).map(w=>`<button class=wc data-w=${w.no}><b>${w.word}</b><small>${w.meaning}</small></button>`).join('')}</div></section>`).join('')}</div>`);
+$('#lo').onclick=async()=>{await sb.auth.signOut();login()};if(ME.is_admin)$('#ab').onclick=admin;
+$('.hm').onclick=e=>{const t=e.target.closest('button');if(!t)return;
+if(t.dataset.d)$('#d'+t.dataset.d).classList.toggle('hid');
+else if(t.dataset.s)start(+t.dataset.s);
+else if(t.dataset.w){const w=W.find(x=>x.no==t.dataset.w);start(Math.ceil(w.no/30),w.no)}}}
+
+// ---------- 관리자
+async function admin(){const[a,b,c]=await Promise.all([sb.from('profiles').select('*').eq('is_admin',false),sb.from('progress').select('*'),sb.from('quiz_results').select('*').order('created_at',{ascending:false})]);
+D=(a.data||[]).map(p=>{const g=(b.data||[]).find(x=>x.user_id==p.id),qs=(c.data||[]).filter(x=>x.user_id==p.id);return{...p,g,qs,t:[g&&g.updated_at,qs[0]&&qs[0].created_at].filter(Boolean).sort().pop()}});
+go(`<div class=hm style="max-width:900px"><header><h1>관리자</h1><span><button id=sv class=b2>학습 화면</button> <button id=lo class=b2>로그아웃</button></span></header>
+<section class=dy><b>학생 계정 만들기</b><div class=fm><input id=nu placeholder="아이디(영문·숫자)" autocapitalize=none><input id=nn placeholder="이름"><input id=np placeholder="비밀번호(6자 이상)"><button id=nc class=b>만들기</button></div><div id=msg style="margin-top:.5rem"></div></section>
+<section class=dy><div class=dh><b style="flex:1;align-self:center">학생 현황</b><button id=s1 class=b>최신순</button><button id=s2 class=b2>이름순</button></div><div class=tw><table><thead><tr><th>학생<th>진행<th>마지막 학습<th>최근 퀴즈<th></thead><tbody id=tb></tbody></table></div></section></div>`);
+$('#lo').onclick=async()=>{await sb.auth.signOut();login()};$('#sv').onclick=home;$('#s1').onclick=()=>view('t');$('#s2').onclick=()=>view('n');
+$('#nc').onclick=async()=>{const u=$('#nu').value.trim().toLowerCase(),n=$('#nn').value.trim(),pw=$('#np').value;
+if(!/^[a-z0-9_]{3,20}$/.test(u)||!n||pw.length<6)return $('#msg').textContent='아이디(영문·숫자 3자 이상), 이름, 비밀번호(6자 이상)를 확인해 주세요.';
+const{error}=await sb.rpc('admin_create_student',{p_username:u,p_password:pw,p_name:n});error?$('#msg').textContent='실패: '+error.message:admin()};
+$('#tb').onclick=async e=>{const i=e.target.closest('[data-i]')?.dataset.i;if(i==null)return;const s=D[i],a=e.target.dataset.a;
+if(a=='pw'){const pw=prompt(s.name+' 새 비밀번호(6자 이상)');if(pw&&pw.length>=6){const{error}=await sb.rpc('admin_reset_password',{p_username:s.username,p_password:pw});alert(error?error.message:'변경했습니다.')}}
+else if(a=='del'){if(confirm(s.name+' 학생과 학습 기록을 모두 삭제할까요?')){await sb.rpc('admin_delete_student',{p_username:s.username});admin()}}
+else $('#h'+i).classList.toggle('hid')};
+view('t')}
+function view(m){D.sort(m=='n'?(a,b)=>a.name.localeCompare(b.name,'ko'):(a,b)=>(b.t||'').localeCompare(a.t||''));
+const f=t=>t?new Date(t).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'-';
+$('#s1').className=m=='n'?'b2':'b';$('#s2').className=m=='n'?'b':'b2';
+$('#tb').innerHTML=D.map((s,i)=>{const q=s.qs[0];return`<tr data-i=${i}><td><b>${esc(s.name)}</b><br><small>${s.username}</small><td>${s.g?`${s.g.day}일차 · ${s.g.pos}/30`:'-'}<td>${f(s.t)}<td>${q?`${q.day}일차 <b>${q.score}</b>/10`:'-'}<td><button class=b2 data-a=pw data-i=${i}>비번</button> <button class=b2 data-a=del data-i=${i}>삭제</button><tr class=hid id=h${i}><td colspan=5>${s.qs.map(x=>`${f(x.created_at)} · ${x.day}일차 ${x.score}/10`).join('<br>')||'퀴즈 기록 없음'}`}).join('')||'<tr><td colspan=5>위에서 학생 계정을 먼저 만들어 주세요.'}
+
+// ---------- 학습
+function start(d,no){const list=dw(d);S={d,list,pos:Math.max(0,list.findIndex(w=>w.no==no)),hist:[]};show(list[S.pos])}
+function show(w){cid=w.no;track();
+go(`<div class=st><div class=txt><div id=bw class=bw>${w.word}</div><div id=df><p>${red(w.definition,w)}</p><p>${red(w.example,w)}</p></div><div class=nav><button id=pv class=b2>이전</button><span>${S.pos+1} / ${S.list.length}</span><button id=nx class=b>다음</button></div></div><div class=pic><img src="${img(w)}" onerror="${hide}"></div></div>`);
+const df=$('#df');df.classList.add('lock');say([aud(w,'word'),aud(w,'defex')],()=>df.classList.remove('lock'));
+$('#bw').onclick=e=>{const b=e.target;if(b.dataset.k)return;b.dataset.k=1;b.textContent=w.meaning;b.classList.add('ko');
+setTimeout(()=>{b.textContent=w.word;b.classList.remove('ko');delete b.dataset.k},2200)};
+df.onclick=e=>{const r=e.target.closest('.rw');if(r)pop(+r.dataset.n)};
+$('#pv').onclick=()=>{const h=S.hist.pop();if(!h)return home();S.pos=h.pos;show(W.find(x=>x.no==h.id))};
+$('#nx').onclick=()=>{S.hist.push({id:cid,pos:S.pos});S.pos++;S.pos>=S.list.length?done():show(S.list[S.pos])}}
+function pop(n){const w=W.find(x=>x.no==n),p=document.createElement('div');p.className='pop';
+p.innerHTML=`<div class=card><img src="${img(w)}" onerror="${hide}"><h2 style="color:var(--blue);margin:.5rem 0">${w.word}</h2><small>그림을 누르면 학습화면으로 이동</small></div>`;
+p.onclick=e=>{if(e.target.tagName=='IMG'){p.remove();S.hist.push({id:cid,pos:S.pos});show(w)}else if(e.target==p)p.remove()};document.body.appendChild(p)}
+function done(){go(`<div class=ctr><h1>오늘 학습 완료!</h1><button id=qg class=b>퀴즈 풀러 가기</button><button id=qs class=b2>그만하기</button></div>`);$('#qg').onclick=quiz;$('#qs').onclick=home}
+
+// ---------- 퀴즈 (10문제: 그림 / 빈칸 / 짝짓기 랜덤)
+function quiz(){Z={i:0,sc:0,qs:sh(S.list).slice(0,10).map(w=>({w,t:['img','cloze','match'][Math.random()*3|0]}))};q()}
+function nxBtn(){const b=$('#qn');b.classList.remove('hid');b.onclick=()=>{Z.i++;q()}}
+function q(){if(Z.i>=Z.qs.length)return fin();const{w,t}=Z.qs[Z.i],head=`<div><b>${Z.i+1}</b> / ${Z.qs.length}</div>`,others=sh(S.list.filter(x=>x.word!=w.word)).slice(0,3);
+if(t=='match')return match(head,[w,...others]);
+const body=t=='img'?`<img class=qi src="${img(w)}" onerror="${hide}">`:`<p class=qt>${blank(w.definition,w)}</p><p class=qt>${blank(w.example,w)}</p>`;
+go(`<div class=qz>${head}${body}<div class=op>${sh([w,...others]).map(x=>`<button class=b2 data-n=${x.no}>${x.word}</button>`).join('')}</div><button id=qn class="b hid">다음</button></div>`);
+let fin_=0;document.querySelectorAll('.op button').forEach(b=>b.onclick=()=>{const x=W.find(v=>v.no==b.dataset.n);say([aud(x,'word')]);if(fin_)return;fin_=1;
+const ok=x.no==w.no;if(ok)Z.sc++;b.classList.add(ok?'ok':'no');if(!ok)document.querySelector(`.op [data-n="${w.no}"]`).classList.add('ok');nxBtn()})}
+function match(head,g){go(`<div class=qz>${head}<p class=qt>단어와 뜻을 짝지어 보세요</p><div class=mt><div style="display:grid;gap:.7rem">${sh(g).map(x=>`<button class=b2 data-l=${x.no}>${x.word}</button>`).join('')}</div><div style="display:grid;gap:.7rem">${sh(g).map(x=>`<button class=b2 data-r=${x.no}>${x.meaning}</button>`).join('')}</div></div><button id=qn class="b hid">다음</button></div>`);
+let sel=null,err=0,m=0;
+document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{if(b.classList.contains('ok'))return;say([aud(W.find(x=>x.no==b.dataset.l),'word')]);document.querySelectorAll('[data-l]').forEach(x=>x.style.outline='');sel=b;b.style.outline='3px solid var(--ink)'});
+document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{if(!sel||b.classList.contains('ok'))return;
+if(sel.dataset.l==b.dataset.r){sel.classList.add('ok');b.classList.add('ok');sel.style.outline='';sel=null;if(++m==4){if(!err)Z.sc++;nxBtn()}}
+else{err++;b.classList.add('no');setTimeout(()=>b.classList.remove('no'),500)}})}
+async function fin(){go(`<div class=ctr><h1>${Z.sc} / ${Z.qs.length}</h1><p>${S.d}일차 퀴즈 결과</p><button id=ag class=b>다시 풀기</button><button id=hm class=b2>목록으로</button></div>`);
+$('#ag').onclick=quiz;$('#hm').onclick=home;try{await sb.from('quiz_results').insert({day:S.d,score:Z.sc})}catch(e){}}
+
+sb.auth.getSession().then(({data})=>data.session?enter():login());
+</script></body></html>
