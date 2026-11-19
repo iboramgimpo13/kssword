@@ -42,14 +42,13 @@ button{font:inherit;cursor:pointer;border-radius:12px;padding:.8rem 1.3rem;borde
 tr[data-i]{cursor:pointer}td button{padding:.35rem .7rem;font-size:.9rem}
 @media (max-aspect-ratio:1/1){.st{grid-template-columns:1fr;grid-template-rows:38% 1fr}.pic{order:-1}}
 </style></head><body><div id="app"></div>
+<script src="config.js"></script>
 <script>
-const SB_URL='https://hjozecorzlyjcsrwucdy.supabase.co', SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhqb3plY29yemx5amNzcnd1Y2R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUwNDIxNzQsImV4cCI6MjExMDYxODE3NH0.DRxqcu3Liv6Fx9sG_VNlTkhPFDLER7vXRtp0ypbnnwU';
 const sb=supabase.createClient(SB_URL,SB_KEY);
 const $=s=>document.querySelector(s),sh=a=>[...a].sort(()=>Math.random()-.5),pad=n=>String(n).padStart(4,'0');
 const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-const pub=p=>sb.storage.from('media').getPublicUrl(p).data.publicUrl;
 const fn=w=>w.word.replace(/[\\/:*?"<>|]/g,'').replace(/\s+/g,' ').trim();
-const img=w=>pub(`img/${pad(w.no)}.jpg`),aud=(w,k)=>pub(`audio/${pad(w.no)} ${fn(w)}_${k}.mp3`);
+const img=w=>`img/${pad(w.no)}.jpg`,aud=(w,k)=>encodeURI(`audio/${pad(w.no)} ${fn(w)}_${k}.mp3`);
 const hide="this.style.visibility='hidden'";
 let W=[],vmap,RX,S,Z,cid,tok=0,ME,D;const track=()=>sb.from('progress').upsert({user_id:ME.id,day:S.d,pos:S.pos+1,updated_at:new Date().toISOString()}).then(()=>{});const A=new Audio();
 function say(u,done){const t=++tok;A.pause();let i=0;const nx=()=>{if(t!=tok)return;if(i>=u.length){done&&done();return}A.src=u[i++];A.onended=nx;A.onerror=nx;A.play().catch(nx)};nx()}
