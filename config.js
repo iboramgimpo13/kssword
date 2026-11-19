@@ -1,0 +1,2 @@
+const SB_URL = 'https://hjozecorzlyjcsrwucdy.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhqb3plY29yemx5amNzcnd1Y2R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUwNDIxNzQsImV4cCI6MjExMDYxODE3NH0.DRxqcu3Liv6Fx9sG_VNlTkhPFDLER7vXRtp0ypbnnwU';
