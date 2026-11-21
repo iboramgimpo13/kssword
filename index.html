@@ -5,14 +5,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
 :root{--bg:#eef3f9;--ink:#0f1b33;--blue:#1558d6;--red:#d9263a;--ok:#1f9d55;--line:#c9d6ea}
-*{box-sizing:border-box}html,body{margin:0;height:100%}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow-x:hidden}
+#app{height:100%}
 body{font-family:system-ui,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:var(--bg);color:var(--ink)}
 button{font:inherit;cursor:pointer;border-radius:12px;padding:.8rem 1.3rem;border:2px solid var(--blue)}
 .b{background:var(--blue);color:#fff}.b2{background:#fff;color:var(--blue)}
 .b:focus-visible,.b2:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 .hid{display:none}.ok{background:var(--ok)!important;color:#fff!important;border-color:var(--ok)!important}
 .no{background:var(--red)!important;color:#fff!important;border-color:var(--red)!important}
-.ctr{min-height:100dvh;display:grid;place-content:center;gap:1rem;text-align:center;padding:1.5rem}
+.ctr{min-height:100%;display:grid;place-content:center;gap:1rem;text-align:center;padding:1.5rem}
 .ctr input{font:inherit;padding:.8rem;border:2px solid var(--line);border-radius:10px;width:min(320px,80vw)}
 .hm{max-width:720px;margin:0 auto;padding:1rem}
 .hm header{display:flex;justify-content:space-between;align-items:center}
@@ -21,15 +22,23 @@ button{font:inherit;cursor:pointer;border-radius:12px;padding:.8rem 1.3rem;borde
 .wl{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.5rem;margin-top:.7rem}
 .wc{background:#f7faff;color:var(--ink);border-color:var(--line);text-align:left;padding:.5rem .7rem}
 .wc b{color:var(--blue);display:block}.wc small{opacity:.75}
-.st{display:grid;grid-template-columns:1fr 1fr;height:100dvh}
-.txt{padding:clamp(1rem,3vw,2.5rem);display:flex;flex-direction:column;overflow:auto}
-.bw{color:var(--blue);font-weight:800;font-size:clamp(2.8rem,8vw,5.5rem);line-height:1.1;cursor:pointer;word-break:break-word}
-.bw.ko{font-size:clamp(1.6rem,4vw,2.6rem);color:var(--ink)}
-.txt p{font-size:clamp(1.2rem,2.5vw,1.9rem);line-height:1.65;margin:.8rem 0}
+.st{--pr:clamp(44px,5.5vw,70px);position:relative;display:grid;grid-template-columns:1fr 1fr;height:100%;min-height:100%}
+.txt{--f:20px;padding:clamp(10px,2.2vh,28px) clamp(10px,2vw,28px) 22px clamp(54px,6.5vw,84px);display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.bw{perspective:900px;cursor:pointer;color:var(--blue);font-weight:800;font-size:calc(var(--f)*2.1);line-height:1.15;word-break:break-word;margin-bottom:.35em;user-select:none;-webkit-tap-highlight-color:transparent}
+.bw .in{display:grid;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.4,.2,.2,1)}
+.bw .in>*{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.bw .bk{transform:rotateX(180deg);color:var(--ink);word-break:keep-all;overflow-wrap:anywhere}
+.bw .in.flip{transform:rotateX(180deg)}
+.df{font-size:var(--f);line-height:1.5;min-height:0}
+.df p{margin:0 0 .55em}
 .rw{color:var(--red);font-weight:700;border-bottom:2px dotted var(--red);cursor:pointer}
 .lock .rw{pointer-events:none}
-.nav{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:.6rem;padding-top:1rem}
-.pic{background:#dfe8f5;display:grid;place-items:center;overflow:hidden}.pic img{width:100%;height:100%;object-fit:contain}
+.side{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:clamp(44px,5.5vw,70px);height:clamp(84px,24vh,150px);padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:clamp(11px,1.6vw,15px);font-weight:700;box-shadow:0 2px 10px rgba(15,27,51,.18)}
+.side span{font-size:clamp(26px,4.5vw,44px);line-height:1}
+#pv{left:0;border-radius:0 16px 16px 0;border-left:0}#nx{right:0;border-radius:16px 0 0 16px;border-right:0}
+.cnt{position:absolute;left:clamp(54px,6.5vw,84px);bottom:4px;font-size:12px;opacity:.6;z-index:4}
+.hb{position:absolute;top:6px;right:clamp(8px,1vw,14px);z-index:6;padding:.25rem .6rem;font-size:12px;border-width:1px;opacity:.85}
+.pic{background:#dfe8f5;position:relative;overflow:hidden;min-height:0}.pic img{position:absolute;left:0;top:0;width:calc(100% - var(--pr));height:100%;object-fit:contain;object-position:center}
 .pop{position:fixed;inset:0;background:rgba(15,27,51,.6);display:grid;place-items:center;z-index:9}
 .pop .card{background:#fff;border-radius:16px;padding:.8rem;width:min(80vw,380px);text-align:center}
 .pop img{width:100%;border-radius:10px;cursor:pointer}
@@ -40,7 +49,12 @@ button{font:inherit;cursor:pointer;border-radius:12px;padding:.8rem 1.3rem;borde
 .fm{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.6rem}.fm input{font:inherit;padding:.7rem;border:2px solid var(--line);border-radius:10px;flex:1;min-width:130px}
 .tw{overflow-x:auto}table{width:100%;border-collapse:collapse;margin-top:.7rem}td,th{padding:.55rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
 tr[data-i]{cursor:pointer}td button{padding:.35rem .7rem;font-size:.9rem}
-@media (max-aspect-ratio:1/1){.st{grid-template-columns:1fr;grid-template-rows:38% 1fr}.pic{order:-1}}
+html[data-m=port] .st{grid-template-columns:1fr;grid-template-rows:38% 1fr}html[data-m=port] .st{--pr:0px}html[data-m=port] .pic{order:-1}html[data-m=port] .txt{padding-left:54px}
+/* 가로 화면 퀴즈: 왼쪽 문제 / 오른쪽 보기 */
+html[data-m=land] .qz{max-width:1000px;grid-template-columns:1fr 1fr;align-items:center;gap:.6rem 1.2rem;padding:.7rem 1rem}
+html[data-m=land] .qz>div:first-child,html[data-m=land] #qn,html[data-m=land] .qz>.qt,html[data-m=land] .qz>.mt{grid-column:1/-1}
+html[data-m=land] .qb{grid-column:1;display:grid;gap:.5rem;justify-items:center}html[data-m=land] .op{grid-column:2;grid-template-columns:1fr}
+html[data-m=land] .qi{width:min(100%,38vh,300px)}html[data-m=land] .qt{font-size:1.05rem;line-height:1.5}html[data-m=land] .op button,html[data-m=land] .mt button{min-height:2.6rem;font-size:1rem;padding:.4rem .8rem}
 </style></head><body><div id="app"></div>
 <script src="config.js"></script>
 <script>
@@ -52,7 +66,7 @@ const img=w=>`img/${pad(w.no)}.jpg`,aud=(w,k)=>encodeURI(`audio/${pad(w.no)} ${f
 const hide="this.style.visibility='hidden'";
 let W=[],vmap,RX,S,Z,cid,tok=0,ME,D;const track=()=>sb.from('progress').upsert({user_id:ME.id,day:S.d,pos:S.pos+1,updated_at:new Date().toISOString()}).then(()=>{});const A=new Audio();
 function say(u,done){const t=++tok;A.pause();let i=0;const nx=()=>{if(t!=tok)return;if(i>=u.length){done&&done();return}A.src=u[i++];A.onended=nx;A.onerror=nx;A.play().catch(nx)};nx()}
-const go=h=>{tok++;A.pause();$('#app').innerHTML=h};
+const go=h=>{tok++;A.pause();$('#app').innerHTML=h;fit()};
 const dw=d=>W.filter(w=>Math.ceil(w.no/30)==d);
 // 단어 변형형태(복수, -ed, -ing, -er, -ly 등)
 function vr(w){w=w.toLowerCase();const s=new Set([w]);if(w.includes(' '))return[...s];const b=w.slice(0,-1),l=w.slice(-1);
@@ -105,16 +119,37 @@ $('#tb').innerHTML=D.map((s,i)=>{const q=s.qs[0];return`<tr data-i=${i}><td><b>$
 // ---------- 학습
 function start(d,no){const list=dw(d);S={d,list,pos:Math.max(0,list.findIndex(w=>w.no==no)),hist:[]};show(list[S.pos])}
 function show(w){cid=w.no;track();
-go(`<div class=st><div class=txt><div id=bw class=bw>${w.word}</div><div id=df><p>${red(w.definition,w)}</p><p>${red(w.example,w)}</p></div><div class=nav><button id=pv class=b2>이전</button><span>${S.pos+1} / ${S.list.length}</span><button id=nx class=b>다음</button></div></div><div class=pic><img src="${img(w)}" onerror="${hide}"></div></div>`);
+go(`<div class=st><button id=hb class="hb b2">목록</button><div class=txt><div id=bw class=bw><div class=in id=bin><div class=fr>${w.word}</div><div class=bk id=bk>${esc(w.meaning)}</div></div></div><div id=df class=df><p>${red(w.definition,w)}</p><p>${red(w.example,w)}</p></div></div><div class=pic><img src="${img(w)}" onerror="${hide}"></div><button id=pv class="side b2"><span>‹</span>이전</button><button id=nx class="side b"><span>›</span>다음</button><div class=cnt>${S.pos+1} / ${S.list.length}</div></div>`);
+fit();
 const df=$('#df');df.classList.add('lock');say([aud(w,'word'),aud(w,'defex')],()=>df.classList.remove('lock'));
-$('#bw').onclick=e=>{const b=e.target;if(b.dataset.k)return;b.dataset.k=1;b.textContent=w.meaning;b.classList.add('ko');
-setTimeout(()=>{b.textContent=w.word;b.classList.remove('ko');delete b.dataset.k},2200)};
+let ko=false,tm=0;const bin=$('#bin');
+$('#bw').onclick=()=>{clearTimeout(tm);ko=!ko;bin.classList.toggle('flip',ko);if(ko)tm=setTimeout(()=>{ko=false;bin.classList.remove('flip')},2000)};
 df.onclick=e=>{const r=e.target.closest('.rw');if(r)pop(+r.dataset.n)};
+$('#hb').onclick=home;
 $('#pv').onclick=()=>{const h=S.hist.pop();if(!h)return home();S.pos=h.pos;show(W.find(x=>x.no==h.id))};
 $('#nx').onclick=()=>{S.hist.push({id:cid,pos:S.pos});S.pos++;S.pos>=S.list.length?done():show(S.list[S.pos])}}
+// ---------- 가로 고정 / 글자 크기 자동 맞춤 ----------
+const touch=matchMedia('(pointer:coarse)').matches;
+function fit(){const w=innerWidth,h=innerHeight,a=$('#app'),R=document.documentElement,rot=touch&&h>w;
+if(rot){a.style.cssText=`position:fixed;left:0;top:0;width:${h}px;height:${w}px;transform-origin:0 0;transform:translateX(${w}px) rotate(90deg);overflow:auto`}else a.style.cssText='';
+const W_=rot?h:w,H_=rot?w:h;R.dataset.m=W_/H_>1.3?'land':'port';
+cancelAnimationFrame(fit.r);fit.r=requestAnimationFrame(autofit)}
+function autofit(){const t=$('.txt'),bw=$('#bw'),df=$('#df');if(!t||!bw||!df)return;
+const cs=getComputedStyle(t),avail=t.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom)-2;
+const ok=f=>{t.style.setProperty('--f',f+'px');kfit();return bw.offsetHeight+parseFloat(getComputedStyle(bw).marginBottom)+df.scrollHeight<=avail};
+let lo=11,hi=80,best=11;while(hi-lo>.5){const m=(lo+hi)/2;if(ok(m)){best=m;lo=m}else hi=m}
+t.style.setProperty('--f',best+'px');kfit()}
+function kfit(){const fr=$('#bin .fr'),bk=$('#bk');if(!fr||!bk)return;bk.style.fontSize='';
+const one=parseFloat(getComputedStyle(fr).lineHeight)||fr.offsetHeight;let sc=1;
+while(bk.offsetHeight>one*2.1&&sc>.5){sc-=.1;bk.style.fontSize=sc+'em'}}
+addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));
+document.fonts&&document.fonts.ready.then(()=>{if($('.txt'))autofit()});
+// 휴대폰: 첫 터치에서 전체화면 + 가로 고정 시도 (안 되는 기기는 화면을 옆으로 눕혀서 보여줌)
+if(touch)addEventListener('pointerdown',function f(){removeEventListener('pointerdown',f);
+const e=document.documentElement;(e.requestFullscreen?e.requestFullscreen():Promise.reject()).then(()=>screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape')).catch(()=>{}).finally(()=>setTimeout(fit,300))});
 function pop(n){const w=W.find(x=>x.no==n),p=document.createElement('div');p.className='pop';
 p.innerHTML=`<div class=card><img src="${img(w)}" onerror="${hide}"><h2 style="color:var(--blue);margin:.5rem 0">${w.word}</h2><small>그림을 누르면 학습화면으로 이동</small></div>`;
-p.onclick=e=>{if(e.target.tagName=='IMG'){p.remove();S.hist.push({id:cid,pos:S.pos});show(w)}else if(e.target==p)p.remove()};document.body.appendChild(p)}
+p.onclick=e=>{if(e.target.tagName=='IMG'){p.remove();S.hist.push({id:cid,pos:S.pos});show(w)}else if(e.target==p)p.remove()};$('#app').appendChild(p)}
 function done(){go(`<div class=ctr><h1>오늘 학습 완료!</h1><button id=qg class=b>퀴즈 풀러 가기</button><button id=qs class=b2>그만하기</button></div>`);$('#qg').onclick=quiz;$('#qs').onclick=home}
 
 // ---------- 퀴즈 (10문제: 그림 / 빈칸 / 짝짓기 랜덤)
@@ -123,7 +158,7 @@ function nxBtn(){const b=$('#qn');b.classList.remove('hid');b.onclick=()=>{Z.i++
 function q(){if(Z.i>=Z.qs.length)return fin();const{w,t}=Z.qs[Z.i],head=`<div><b>${Z.i+1}</b> / ${Z.qs.length}</div>`,others=sh(S.list.filter(x=>x.word!=w.word)).slice(0,3);
 if(t=='match')return match(head,[w,...others]);
 const body=t=='img'?`<img class=qi src="${img(w)}" onerror="${hide}">`:`<p class=qt>${blank(w.definition,w)}</p><p class=qt>${blank(w.example,w)}</p>`;
-go(`<div class=qz>${head}${body}<div class=op>${sh([w,...others]).map(x=>`<button class=b2 data-n=${x.no}>${x.word}</button>`).join('')}</div><button id=qn class="b hid">다음</button></div>`);
+go(`<div class=qz>${head}<div class=qb>${body}</div><div class=op>${sh([w,...others]).map(x=>`<button class=b2 data-n=${x.no}>${x.word}</button>`).join('')}</div><button id=qn class="b hid">다음</button></div>`);
 let fin_=0;document.querySelectorAll('.op button').forEach(b=>b.onclick=()=>{const x=W.find(v=>v.no==b.dataset.n);say([aud(x,'word')]);if(fin_)return;fin_=1;
 const ok=x.no==w.no;if(ok)Z.sc++;b.classList.add(ok?'ok':'no');if(!ok)document.querySelector(`.op [data-n="${w.no}"]`).classList.add('ok');nxBtn()})}
 function match(head,g){go(`<div class=qz>${head}<p class=qt>단어와 뜻을 짝지어 보세요</p><div class=mt><div style="display:grid;gap:.7rem">${sh(g).map(x=>`<button class=b2 data-l=${x.no}>${x.word}</button>`).join('')}</div><div style="display:grid;gap:.7rem">${sh(g).map(x=>`<button class=b2 data-r=${x.no}>${x.meaning}</button>`).join('')}</div></div><button id=qn class="b hid">다음</button></div>`);
