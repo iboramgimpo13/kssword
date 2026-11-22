@@ -42,19 +42,25 @@ button{font:inherit;cursor:pointer;border-radius:12px;padding:.8rem 1.3rem;borde
 .pop{position:fixed;inset:0;background:rgba(15,27,51,.6);display:grid;place-items:center;z-index:9}
 .pop .card{background:#fff;border-radius:16px;padding:.8rem;width:min(80vw,380px);text-align:center}
 .pop img{width:100%;border-radius:10px;cursor:pointer}
-.qz{max-width:760px;margin:0 auto;padding:1.2rem;display:grid;gap:1rem;justify-items:center;text-align:center}
-.qi{width:min(100%,420px);aspect-ratio:1;object-fit:contain;background:#dfe8f5;border-radius:16px}
-.qt{font-size:1.35rem;line-height:1.7;margin:0}.bl{color:var(--blue);letter-spacing:.05em}
-.op,.mt{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;width:100%}.op button,.mt button{font-size:1.15rem;min-height:3.4rem}
 .fm{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.6rem}.fm input{font:inherit;padding:.7rem;border:2px solid var(--line);border-radius:10px;flex:1;min-width:130px}
 .tw{overflow-x:auto}table{width:100%;border-collapse:collapse;margin-top:.7rem}td,th{padding:.55rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
 tr[data-i]{cursor:pointer}td button{padding:.35rem .7rem;font-size:.9rem}
-html[data-m=port] .st{grid-template-columns:1fr;grid-template-rows:38% 1fr}html[data-m=port] .st{--pr:0px}html[data-m=port] .pic{order:-1}html[data-m=port] .txt{padding-left:54px}
-/* 가로 화면 퀴즈: 왼쪽 문제 / 오른쪽 보기 */
-html[data-m=land] .qz{max-width:1000px;grid-template-columns:1fr 1fr;align-items:center;gap:.6rem 1.2rem;padding:.7rem 1rem}
-html[data-m=land] .qz>div:first-child,html[data-m=land] #qn,html[data-m=land] .qz>.qt,html[data-m=land] .qz>.mt{grid-column:1/-1}
-html[data-m=land] .qb{grid-column:1;display:grid;gap:.5rem;justify-items:center}html[data-m=land] .op{grid-column:2;grid-template-columns:1fr}
-html[data-m=land] .qi{width:min(100%,38vh,300px)}html[data-m=land] .qt{font-size:1.05rem;line-height:1.5}html[data-m=land] .op button,html[data-m=land] .mt button{min-height:2.6rem;font-size:1rem;padding:.4rem .8rem}
+html[data-m=port] .st{grid-template-columns:1fr;grid-template-rows:38% 1fr}html[data-m=port] .st{--pr:0px}html[data-m=port] .pic{order:-1}
+/* ---- 퀴즈: 가로 화면 기준 (왼쪽 문제 / 오른쪽 보기 / 아래 다음 버튼) ---- */
+.bl{color:var(--blue);letter-spacing:.05em}
+.qz{--qf:clamp(14px,calc(var(--vh,1vh)*4.2),32px);--qb:clamp(14px,calc(var(--vh,1vh)*4.6),26px);height:100%;max-width:1100px;margin:0 auto;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:clamp(6px,1.6vh,14px);padding:clamp(8px,2vh,18px) clamp(14px,3vw,40px);padding-left:calc(clamp(14px,3vw,40px) + env(safe-area-inset-left,0px));padding-right:calc(clamp(14px,3vw,40px) + env(safe-area-inset-right,0px))}
+.qhd{display:flex;align-items:center;gap:.8rem;font-size:var(--qb)}.bar{flex:1;height:8px;border-radius:9px;background:#d5e0f1;overflow:hidden}.bar i{display:block;height:100%;background:var(--blue);transition:width .3s}
+.qmain{display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,2vw,28px);min-height:0}
+.qq{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left;min-height:0;overflow:auto}
+.qlab{color:var(--blue);font-weight:800;font-size:var(--qb);margin-bottom:.5em}
+.qq p{font-size:var(--qf);line-height:1.5;margin:0 0 .5em}.qq .big{font-size:calc(var(--qf)*1.7);font-weight:800;color:var(--ink);line-height:1.3}
+.spk{font-size:var(--qb);padding:.7rem 1.3rem}
+.op{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(0,1fr);gap:clamp(6px,1.6vh,14px);min-height:0}
+.op button,.mc button{font-size:var(--qb);padding:.25rem .6rem;min-height:0;line-height:1.25;word-break:keep-all;overflow-wrap:anywhere}
+.mwrap{grid-column:1/-1;display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0}
+.mt{display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,2vw,24px);min-height:0}.mc{display:grid;grid-auto-rows:minmax(0,1fr);gap:clamp(6px,1.6vh,14px);min-height:0}
+.qft{display:flex;justify-content:flex-end;align-items:center;gap:1rem;min-height:clamp(38px,10vh,54px)}.fb{font-size:var(--qb);flex:1;text-align:left}.qft .b{font-size:var(--qb);padding:.4rem 1.6rem}
+html[data-m=port] .qmain{grid-template-columns:1fr}html[data-m=port] .op button{padding:.5rem}html[data-m=port] .txt{padding-left:54px}
 </style></head><body><div id="app"></div>
 <script src="config.js"></script>
 <script>
@@ -132,7 +138,7 @@ $('#nx').onclick=()=>{S.hist.push({id:cid,pos:S.pos});S.pos++;S.pos>=S.list.leng
 const touch=matchMedia('(pointer:coarse)').matches;let learn=false;
 function fit(){const w=innerWidth,h=innerHeight,a=$('#app'),R=document.documentElement,rot=learn&&touch&&h>w;
 if(rot){a.style.cssText=`position:fixed;left:0;top:0;width:${h}px;height:${w}px;transform-origin:0 0;transform:translateX(${w}px) rotate(90deg);overflow:auto`}else a.style.cssText='';
-const W_=rot?h:w,H_=rot?w:h;R.dataset.m=W_/H_>1.3?'land':'port';
+const W_=rot?h:w,H_=rot?w:h;R.dataset.m=W_/H_>1.3?'land':'port';R.style.setProperty('--vh',H_/100+'px');
 cancelAnimationFrame(fit.r);fit.r=requestAnimationFrame(autofit)}
 function autofit(){const t=$('.txt'),bw=$('#bw'),df=$('#df');if(!t||!bw||!df)return;
 const cs=getComputedStyle(t),avail=t.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom)-2;
@@ -154,22 +160,30 @@ p.innerHTML=`<div class=card><img src="${img(w)}" onerror="${hide}"><h2 style="c
 p.onclick=e=>{if(e.target.tagName=='IMG'){p.remove();S.hist.push({id:cid,pos:S.pos});show(w)}else if(e.target==p)p.remove()};$('#app').appendChild(p)}
 function done(){go(`<div class=ctr><h1>오늘 학습 완료!</h1><button id=qg class=b>퀴즈 풀러 가기</button><button id=qs class=b2>그만하기</button></div>`);$('#qg').onclick=quiz;$('#qs').onclick=home}
 
-// ---------- 퀴즈 (10문제: 그림 / 빈칸 / 짝짓기 랜덤)
-function quiz(){Z={i:0,sc:0,qs:sh(S.list).slice(0,10).map(w=>({w,t:['img','cloze','match'][Math.random()*3|0]}))};q()}
-function nxBtn(){const b=$('#qn');b.classList.remove('hid');b.onclick=()=>{Z.i++;q()}}
-function q(){if(Z.i>=Z.qs.length)return fin();const{w,t}=Z.qs[Z.i],head=`<div><b>${Z.i+1}</b> / ${Z.qs.length}</div>`,others=sh(S.list.filter(x=>x.word!=w.word)).slice(0,3);
-if(t=='match')return match(head,[w,...others]);
-const body=t=='img'?`<img class=qi src="${img(w)}" onerror="${hide}">`:`<p class=qt>${blank(w.definition,w)}</p><p class=qt>${blank(w.example,w)}</p>`;
-go(`<div class=qz>${head}<div class=qb>${body}</div><div class=op>${sh([w,...others]).map(x=>`<button class=b2 data-n=${x.no}>${x.word}</button>`).join('')}</div><button id=qn class="b hid">다음</button></div>`);
-let fin_=0;document.querySelectorAll('.op button').forEach(b=>b.onclick=()=>{const x=W.find(v=>v.no==b.dataset.n);say([aud(x,'word')]);if(fin_)return;fin_=1;
-const ok=x.no==w.no;if(ok)Z.sc++;b.classList.add(ok?'ok':'no');if(!ok)document.querySelector(`.op [data-n="${w.no}"]`).classList.add('ok');nxBtn()})}
-function match(head,g){go(`<div class=qz>${head}<p class=qt>단어와 뜻을 짝지어 보세요</p><div class=mt><div style="display:grid;gap:.7rem">${sh(g).map(x=>`<button class=b2 data-l=${x.no}>${x.word}</button>`).join('')}</div><div style="display:grid;gap:.7rem">${sh(g).map(x=>`<button class=b2 data-r=${x.no}>${x.meaning}</button>`).join('')}</div></div><button id=qn class="b hid">다음</button></div>`);
+// ---------- 퀴즈 (10문제: 영영풀이 빈칸 / 단어-뜻 짝짓기 / 듣고 뜻 고르기 / 뜻 보고 영단어 고르기) ----------
+const QT=['cloze','match','listen','mean'];
+function quiz(){Z={i:0,sc:0,wrong:[],qs:sh(S.list).slice(0,10).map(w=>({w,t:QT[Math.random()*QT.length|0]}))};q()}
+const hdr=()=>`<div class=qhd><div class=bar><i style="width:${Z.i/Z.qs.length*100}%"></i></div><span><b>${Z.i+1}</b> / ${Z.qs.length}</span></div>`;
+const ftr='<div class=qft><span id=fb class=fb></span><button id=qn class=b style="visibility:hidden">다음</button></div>';
+function nxBtn(msg){$('#fb').innerHTML=msg||'';const b=$('#qn');b.style.visibility='visible';b.onclick=()=>{Z.i++;q()}}
+function q(){if(Z.i>=Z.qs.length)return fin();const{w,t}=Z.qs[Z.i],others=sh(S.list.filter(x=>x.word!=w.word)).slice(0,3),four=sh([w,...others]);
+if(t=='match')return match(w,[w,...others]);
+let lab,left,opts;
+if(t=='cloze'){lab='빈칸에 들어갈 단어는?';left=`<p>${blank(w.definition,w)}</p><p>${blank(w.example,w)}</p>`;opts=four.map(x=>[x.no,x.word])}
+else if(t=='listen'){lab='소리를 듣고 알맞은 뜻을 고르세요';left='<button id=spk class="b spk">🔊 다시 듣기</button>';opts=four.map(x=>[x.no,x.meaning])}
+else{lab='이 뜻에 맞는 영단어는?';left=`<p class=big>${esc(w.meaning)}</p>`;opts=four.map(x=>[x.no,x.word])}
+go(`<div class=qz>${hdr()}<div class=qmain><div class=qq><small class=qlab>${lab}</small>${left}</div><div class=op>${opts.map(o=>`<button class=b2 data-n=${o[0]}>${esc(o[1])}</button>`).join('')}</div></div>${ftr}</div>`);
+if(t=='listen'){const play=()=>say([aud(w,'word')]);$('#spk').onclick=play;play()}
+let done=0;document.querySelectorAll('.op button').forEach(b=>b.onclick=()=>{const x=W.find(v=>v.no==b.dataset.n),first=!done;
+if(first){done=1;const ok=x.no==w.no;if(ok)Z.sc++;else Z.wrong.push(w.word);b.classList.add(ok?'ok':'no');if(!ok)document.querySelector(`.op [data-n="${w.no}"]`).classList.add('ok');nxBtn(`<b>${w.word}</b> &nbsp;${esc(w.meaning)}`)}
+say([aud(t=='listen'&&first?w:x,'word')])})}
+function match(w,g){go(`<div class=qz>${hdr()}<div class=qmain><div class=mwrap><small class=qlab>단어와 뜻을 짝지어 보세요</small><div class=mt><div class=mc>${sh(g).map(x=>`<button class=b2 data-l=${x.no}>${x.word}</button>`).join('')}</div><div class=mc>${sh(g).map(x=>`<button class=b2 data-r=${x.no}>${esc(x.meaning)}</button>`).join('')}</div></div></div></div>${ftr}</div>`);
 let sel=null,err=0,m=0;
 document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{if(b.classList.contains('ok'))return;say([aud(W.find(x=>x.no==b.dataset.l),'word')]);document.querySelectorAll('[data-l]').forEach(x=>x.style.outline='');sel=b;b.style.outline='3px solid var(--ink)'});
 document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{if(!sel||b.classList.contains('ok'))return;
-if(sel.dataset.l==b.dataset.r){sel.classList.add('ok');b.classList.add('ok');sel.style.outline='';sel=null;if(++m==4){if(!err)Z.sc++;nxBtn()}}
+if(sel.dataset.l==b.dataset.r){sel.classList.add('ok');b.classList.add('ok');sel.style.outline='';sel=null;if(++m==4){if(!err)Z.sc++;else Z.wrong.push(w.word);nxBtn(err?'다 맞췄어요! (틀린 횟수 '+err+')':'한 번에 다 맞췄어요!')}}
 else{err++;b.classList.add('no');setTimeout(()=>b.classList.remove('no'),500)}})}
-async function fin(){go(`<div class=ctr><h1>${Z.sc} / ${Z.qs.length}</h1><p>${S.d}일차 퀴즈 결과</p><button id=ag class=b>다시 풀기</button><button id=hm class=b2>목록으로</button></div>`);
+async function fin(){const wr=[...new Set(Z.wrong)];go(`<div class=ctr><h1>${Z.sc} / ${Z.qs.length}</h1><p>${S.d}일차 퀴즈 결과</p>${wr.length?`<p style="max-width:80%">다시 볼 단어: <b>${wr.join(', ')}</b></p>`:'<p>모두 맞췄어요! 🎉</p>'}<div style="display:flex;gap:.8rem;justify-content:center"><button id=ag class=b>다시 풀기</button><button id=hm class=b2>목록으로</button></div></div>`);
 $('#ag').onclick=quiz;$('#hm').onclick=home;try{await sb.from('quiz_results').insert({day:S.d,score:Z.sc})}catch(e){}}
 
 sb.auth.getSession().then(({data})=>data.session?enter():login());
