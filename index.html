@@ -129,8 +129,8 @@ go(`<div class=st><button id=hb class="hb b2">목록</button><div class=txt><div
 fit();
 const df=$('#df');df.classList.add('lock');say([aud(w,'word'),aud(w,'defex')],()=>df.classList.remove('lock'));
 let ko=false,tm=0;const bin=$('#bin');
-$('#bw').onclick=()=>{clearTimeout(tm);ko=!ko;bin.classList.toggle('flip',ko);if(ko)tm=setTimeout(()=>{ko=false;bin.classList.remove('flip')},2000)};
-df.onclick=e=>{const r=e.target.closest('.rw');if(r)pop(+r.dataset.n)};
+$('#bw').onclick=()=>{const busy=df.classList.contains('lock');clearTimeout(tm);ko=!ko;bin.classList.toggle('flip',ko);if(ko)tm=setTimeout(()=>{ko=false;bin.classList.remove('flip')},2000);if(!busy)say([aud(w,'word')])};
+df.onclick=e=>{const r=e.target.closest('.rw');if(r)return pop(+r.dataset.n);if(df.classList.contains('lock'))return;df.classList.add('lock');say([aud(w,'defex')],()=>df.classList.remove('lock'))};
 $('#hb').onclick=home;
 $('#pv').onclick=()=>{const h=S.hist.pop();if(!h)return home();S.pos=h.pos;show(W.find(x=>x.no==h.id))};
 $('#nx').onclick=()=>{S.hist.push({id:cid,pos:S.pos});S.pos++;S.pos>=S.list.length?done():show(S.list[S.pos])}}
