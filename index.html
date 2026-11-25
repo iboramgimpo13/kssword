@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>영단어 학습</title>
+<title>KSS 고3 영단어</title>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#f0564a"><link rel="icon" type="image/png" href="icons/favicon-32.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="KSS 고3단어"><meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
 :root{--bg:#eef3f9;--ink:#0f1b33;--blue:#1558d6;--red:#d9263a;--ok:#1f9d55;--line:#c9d6ea}
@@ -15,7 +16,9 @@ button{font:inherit;cursor:pointer;border-radius:12px;padding:.8rem 1.3rem;borde
 .no{background:var(--red)!important;color:#fff!important;border-color:var(--red)!important}
 .ctr{min-height:100%;display:grid;place-content:center;gap:1rem;text-align:center;padding:1.5rem}
 .ctr input{font:inherit;padding:.8rem;border:2px solid var(--line);border-radius:10px;width:min(320px,80vw)}
-.hm{max-width:720px;margin:0 auto;padding:1rem}
+.hm{max-width:720px;margin:0 auto;padding:1rem 1rem 0;height:100%;display:flex;flex-direction:column;overflow:hidden}
+.hm header h1{margin:.2rem 0;font-size:1.3rem}.gs{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:1.2rem}
+.hm.adm{max-width:900px;overflow:visible;height:auto;padding-bottom:1rem}
 .hm header{display:flex;justify-content:space-between;align-items:center}
 .dy{background:#fff;border-radius:16px;margin:.8rem 0;padding:.8rem;border:1px solid var(--line)}
 /* ---- 홈: 강 목록 (2열 카드, 펼치면 단어 버튼) ---- */
@@ -41,7 +44,7 @@ button{font:inherit;cursor:pointer;border-radius:12px;padding:.8rem 1.3rem;borde
 .hint{font-size:.74rem;color:#5b6b86;margin:.35rem 0 0}
 .dh{display:flex;gap:.6rem}
 .st{--pr:clamp(44px,5.5vw,70px);position:relative;display:grid;grid-template-columns:1fr 1fr;height:100%;min-height:100%}
-.txt{--f:20px;padding:clamp(10px,2.2vh,28px) clamp(10px,2vw,28px) 22px calc(clamp(54px,6.5vw,84px) + env(safe-area-inset-left,0px));display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.txt{--f:20px;padding:clamp(10px,2.2vh,28px) clamp(10px,2vw,28px) 30px calc(clamp(54px,6.5vw,84px) + env(safe-area-inset-left,0px));display:flex;flex-direction:column;overflow:hidden;min-height:0}
 .bw{perspective:900px;cursor:pointer;color:var(--blue);font-weight:800;font-size:calc(var(--f)*2.1);line-height:1.15;word-break:break-word;margin-bottom:.35em;user-select:none;-webkit-tap-highlight-color:transparent}
 .bw .in{display:grid;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.4,.2,.2,1)}
 .bw .in>*{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden}
@@ -54,8 +57,8 @@ button{font:inherit;cursor:pointer;border-radius:12px;padding:.8rem 1.3rem;borde
 .side{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:clamp(44px,5.5vw,70px);height:clamp(84px,24vh,150px);padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:clamp(11px,1.6vw,15px);font-weight:700;box-shadow:0 2px 10px rgba(15,27,51,.18)}
 .side span{font-size:clamp(26px,4.5vw,44px);line-height:1}
 #pv{left:env(safe-area-inset-left,0px);border-radius:0 16px 16px 0;border-left:0}#nx{right:env(safe-area-inset-right,0px);border-radius:16px 0 0 16px;border-right:0}
-.cnt{position:absolute;left:clamp(54px,6.5vw,84px);bottom:4px;font-size:12px;opacity:.6;z-index:4}
-.hb{position:absolute;top:6px;right:clamp(8px,1vw,14px);z-index:6;padding:.25rem .6rem;font-size:12px;border-width:1px;opacity:.85}
+.cnt{position:absolute;left:clamp(54px,6.5vw,84px);bottom:4px;font-size:17px;font-weight:700;opacity:.75;z-index:4}
+.hb{position:absolute;top:6px;right:clamp(8px,1vw,14px);z-index:6;padding:.35rem .85rem;font-size:16px;font-weight:700;border-width:1.5px;opacity:.9}
 .pic{background:#dfe8f5;position:relative;overflow:hidden;min-height:0}.pic img{position:absolute;left:0;top:0;width:calc(100% - var(--pr));height:100%;object-fit:contain;object-position:center}
 .pop{position:fixed;inset:0;background:rgba(15,27,51,.6);display:grid;place-items:center;z-index:9}
 .pop .card{background:#fff;border-radius:16px;padding:.8rem;width:min(80vw,380px);text-align:center}
@@ -106,7 +109,7 @@ const red=(t,w)=>{const s=new Set(vr(w.word));return esc(t).replace(RX,m=>{const
 const blank=(t,w)=>esc(t).replace(new RegExp('\\b('+vr(w.word).sort((a,b)=>b.length-a.length).join('|')+')\\b','gi'),'<b class=bl>_____</b>');
 
 // ---------- 로그인
-function login(msg=''){leaveLearn();go(`<div class=ctr><h1>영단어 학습</h1><input id=em placeholder="아이디" autocomplete=username autocapitalize=none><input id=pw type=password placeholder="비밀번호" autocomplete=current-password><button id=li class=b>로그인</button><div style="color:var(--red)">${msg}</div></div>`);
+function login(msg=''){leaveLearn();go(`<div class=ctr><h1>KSS 고3 영단어</h1><input id=em placeholder="아이디" autocomplete=username autocapitalize=none><input id=pw type=password placeholder="비밀번호" autocomplete=current-password><button id=li class=b>로그인</button><div style="color:var(--red)">${msg}</div></div>`);
 $('#li').onclick=async()=>{if(SB_URL.includes('YOUR-')||SB_KEY.includes('YOUR-'))return login('index.html에 Supabase 주소와 키를 아직 넣지 않았습니다.');const{error}=await sb.auth.signInWithPassword({email:$('#em').value.trim().toLowerCase()+'@student.local',password:$('#pw').value});error?login('로그인 실패: '+error.message):enter()}}
 async function fetchWords(){let all=[],from=0;for(;;){const{data,error}=await sb.from('words').select('no,word,meaning,definition,example').order('no').range(from,from+999);if(error)return{error};all=all.concat(data||[]);if(!data||data.length<1000)break;from+=1000}return{data:all}}
 async function enter(){const{data,error}=await fetchWords();
@@ -126,12 +129,12 @@ function home(){leaveLearn();const n=Math.ceil(W.length/30),nx=nextDay(n),dc=Obj
 const cells=[...Array(n)].map((_,i)=>{const d=i+1,ws=dw(d),dn=DONE[d],o=OPEN==d;
 return`<section class="cell${dn?' dn':''}${d==nx?' nx':''}${o?' open':''}"><div class=ch><b>${d}강</b><span class=st>${dn?'✓'+(dn.best_score!=null?' '+dn.best_score+'/10':''):d==nx?'다음':''}</span><button class=go data-s=${d}>학습시작</button></div>
 <button class=sm data-x=${d}><span class=sw>${ws.slice(0,3).map(w=>w.word).join(' · ')}</span><i>${o?'▲':'⋯'}</i></button>${o?`<p class=hint>단어를 누르면 뜻이 보여요 · ▶를 누르면 그 단어부터 학습해요</p><div class=wl>${ws.map(w=>`<div class=wc><button class=wf data-f=${w.no}><span class=in><span class=fr>${esc(w.word)}</span><span class=bk><em>${esc(w.meaning)}</em></span></span></button><button class="wp b" data-p=${w.no} aria-label="여기서 학습 시작">▶</button></div>`).join('')}</div>`:''}</section>`}).join('');
-go(`<div class=hm><header><h1>영단어</h1><span>${ME.is_admin?'<button id=ab class=b2>관리자</button> ':''}<button id=lo class=b2>로그아웃</button></span></header>
+go(`<div class=hm><header><h1>KSS 고3 영단어</h1><span>${ME.is_admin?'<button id=ab class=b2>관리자</button> ':''}<button id=lo class=b2>로그아웃</button></span></header>
 ${nx?`<div class=nb><span>지금 할 차례</span><b>${nx}강</b><button class=b data-s=${nx}>학습시작</button><small><span class=pg><i style="width:${dc/n*100}%"></i></span>완료 ${dc} / ${n}강</small></div>`:`<div class=nb><b>모든 강 완료! 🎉</b><small><span class=pg><i style="width:100%"></i></span>완료 ${dc} / ${n}강</small></div>`}
-<div class=gr>${cells}</div></div>`);
+<div class=gs><div class=gr>${cells}</div></div></div>`);
 $('#lo').onclick=async()=>{await sb.auth.signOut();login()};if(ME.is_admin)$('#ab').onclick=admin;
 $('.hm').onclick=e=>{const t=e.target.closest('button');if(!t)return;const q=t.dataset;
-if(q.x){OPEN=OPEN==+q.x?0:+q.x;home();const o=$('.cell.open');if(o)o.scrollIntoView({block:'nearest',behavior:'smooth'})}
+if(q.x){const sc=$('.gs').scrollTop;OPEN=OPEN==+q.x?0:+q.x;home();$('.gs').scrollTop=sc;const o=$('.cell.open');if(o)o.scrollIntoView({block:'nearest',behavior:'smooth'})}
 else if(q.s){enterLearn();start(+q.s)}
 else if(q.p){const w=W.find(x=>x.no==q.p);enterLearn();start(Math.ceil(w.no/30),w.no)}
 else if(q.f){const w=W.find(x=>x.no==q.f),el=t.querySelector('.in');clearTimeout(FL.get(w.no));const on=!el.classList.contains('flip');el.classList.toggle('flip',on);
@@ -140,7 +143,7 @@ if(on)FL.set(w.no,setTimeout(()=>el.classList.remove('flip'),2000));say([aud(w,'
 // ---------- 관리자
 async function admin(){leaveLearn();const[a,b,c,dd]=await Promise.all([sb.from('profiles').select('*').eq('is_admin',false),sb.from('progress').select('*'),sb.from('quiz_results').select('*').order('created_at',{ascending:false}),sb.from('day_done').select('*')]);
 D=(a.data||[]).map(p=>{const g=(b.data||[]).find(x=>x.user_id==p.id),qs=(c.data||[]).filter(x=>x.user_id==p.id);return{...p,g,qs,done:(dd.data||[]).filter(x=>x.user_id==p.id).length,t:[g&&g.updated_at,qs[0]&&qs[0].created_at].filter(Boolean).sort().pop()}});
-go(`<div class=hm style="max-width:900px"><header><h1>관리자</h1><span><button id=sv class=b2>학습 화면</button> <button id=lo class=b2>로그아웃</button></span></header>
+go(`<div class="hm adm"><header><h1>관리자</h1><span><button id=sv class=b2>학습 화면</button> <button id=lo class=b2>로그아웃</button></span></header>
 <section class=dy><b>학생 계정 만들기</b><div class=fm><input id=nu placeholder="아이디(영문·숫자)" autocapitalize=none><input id=nn placeholder="이름"><input id=np placeholder="비밀번호(6자 이상)"><button id=nc class=b>만들기</button></div><div id=msg style="margin-top:.5rem"></div></section>
 <section class=dy><div class=dh><b style="flex:1;align-self:center">학생 현황</b><button id=s1 class=b>최신순</button><button id=s2 class=b2>이름순</button></div><div class=tw><table><thead><tr><th>학생<th>진행<th>마지막 학습<th>최근 퀴즈<th></thead><tbody id=tb></tbody></table></div></section></div>`);
 $('#lo').onclick=async()=>{await sb.auth.signOut();login()};$('#sv').onclick=home;$('#s1').onclick=()=>view('t');$('#s2').onclick=()=>view('n');
@@ -166,8 +169,8 @@ const df=$('#df');df.classList.add('lock');say([aud(w,'word'),aud(w,'defex')],()
 let ko=false,tm=0;const bin=$('#bin');
 $('#bw').onclick=()=>{const busy=df.classList.contains('lock');clearTimeout(tm);ko=!ko;bin.classList.toggle('flip',ko);if(ko)tm=setTimeout(()=>{ko=false;bin.classList.remove('flip')},2000);if(!busy)say([aud(w,'word')])};
 df.onclick=e=>{const r=e.target.closest('.rw');if(r)return pop(+r.dataset.n);if(df.classList.contains('lock'))return;df.classList.add('lock');say([aud(w,'defex')],()=>df.classList.remove('lock'))};
-$('#hb').onclick=home;
-$('#pv').onclick=()=>{const h=S.hist.pop();if(!h)return home();S.pos=h.pos;show(W.find(x=>x.no==h.id))};
+$('#hb').onclick=exitToHome;
+$('#pv').onclick=()=>{const h=S.hist.pop();if(!h)return exitToHome();S.pos=h.pos;show(W.find(x=>x.no==h.id))};
 $('#nx').onclick=()=>{S.hist.push({id:cid,pos:S.pos});S.pos++;S.pos>=S.list.length?done():show(S.list[S.pos])}}
 // ---------- 가로 고정 / 글자 크기 자동 맞춤 ----------
 const touch=matchMedia('(pointer:coarse)').matches;let learn=false;
@@ -186,14 +189,14 @@ while(bk.offsetHeight>one*2.1&&sc>.5){sc-=.1;bk.style.fontSize=sc+'em'}}
 addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));
 document.fonts&&document.fonts.ready.then(()=>{if($('.txt'))autofit()});
 // 학습 모드: 학습시작/단어 선택 때만 전체화면 + 가로 고정 (목록·로그인·관리자 화면에서는 해제)
-function enterLearn(){learn=true;if(!touch)return;const e=document.documentElement;
-(e.requestFullscreen?e.requestFullscreen({navigationUI:'hide'}):Promise.reject()).then(()=>screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape')).catch(()=>{}).finally(()=>setTimeout(fit,300))}
+function enterLearn(){learn=true;if(!learnPushed){history.pushState({k:'learn'},'');learnPushed=true}if(!touch)return;const e=document.documentElement;
+(e.requestFullscreen?e.requestFullscreen({navigationUI:'show'}):Promise.reject()).then(()=>screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape')).catch(()=>{}).finally(()=>setTimeout(fit,300))}
 function leaveLearn(){if(!learn)return;learn=false;try{screen.orientation&&screen.orientation.unlock&&screen.orientation.unlock()}catch(e){}
 try{document.fullscreenElement&&document.exitFullscreen()}catch(e){}setTimeout(fit,300)}
 function pop(n){const w=W.find(x=>x.no==n),p=document.createElement('div');p.className='pop';
 p.innerHTML=`<div class=card><img src="${img(w)}" onerror="${hide}"><h2 style="color:var(--blue);margin:.5rem 0">${w.word}</h2><small>그림을 누르면 학습화면으로 이동</small></div>`;
 p.onclick=e=>{if(e.target.tagName=='IMG'){p.remove();S.hist.push({id:cid,pos:S.pos});show(w)}else if(e.target==p)p.remove()};$('#app').appendChild(p)}
-function done(){markDone(S.d);go(`<div class=ctr><h1>오늘 학습 완료!</h1><button id=qg class=b>퀴즈 풀러 가기</button><button id=qs class=b2>그만하기</button></div>`);$('#qg').onclick=quiz;$('#qs').onclick=home}
+function done(){markDone(S.d);go(`<div class=ctr><h1>오늘 학습 완료!</h1><button id=qg class=b>퀴즈 풀러 가기</button><button id=qs class=b2>그만하기</button></div>`);$('#qg').onclick=quiz;$('#qs').onclick=exitToHome}
 
 // ---------- 퀴즈 (10문제: 영영풀이 빈칸 / 단어-뜻 짝짓기 / 듣고 뜻 고르기 / 뜻 보고 영단어 고르기) ----------
 const QT=['cloze','match','listen','mean'];
@@ -219,7 +222,21 @@ document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{if(!sel||b.class
 if(sel.dataset.l==b.dataset.r){sel.classList.add('ok');b.classList.add('ok');sel.style.outline='';sel=null;if(++m==4){if(!err)Z.sc++;else Z.wrong.push(w.word);nxBtn(err?'다 맞췄어요! (틀린 횟수 '+err+')':'한 번에 다 맞췄어요!')}}
 else{err++;b.classList.add('no');setTimeout(()=>b.classList.remove('no'),500)}})}
 async function fin(){markDone(S.d,Z.sc);const wr=[...new Set(Z.wrong)];go(`<div class=ctr><h1>${Z.sc} / ${Z.qs.length}</h1><p>${S.d}강 퀴즈 결과</p>${wr.length?`<p style="max-width:80%">다시 볼 단어: <b>${wr.join(', ')}</b></p>`:'<p>모두 맞췄어요! 🎉</p>'}<div style="display:flex;gap:.8rem;justify-content:center"><button id=ag class=b>다시 풀기</button><button id=hm class=b2>목록으로</button></div></div>`);
-$('#ag').onclick=quiz;$('#hm').onclick=home;try{await sb.from('quiz_results').insert({day:S.d,score:Z.sc})}catch(e){}}
+$('#ag').onclick=quiz;$('#hm').onclick=exitToHome;try{await sb.from('quiz_results').insert({day:S.d,score:Z.sc})}catch(e){}}
+
+// ---------- 뒤로가기: 학습(전체화면) → 목록 → 종료 확인 ----------
+let learnPushed=false,skipFS=false;
+function exitToHome(){if(learnPushed){skipFS=true;history.back()}else home()}
+(function(){const k=history.state&&history.state.k;
+if(!k){history.replaceState({k:'exit'},'');addEventListener('pointerdown',()=>{if(history.state&&history.state.k==='exit')history.pushState({k:'main'},'')},{once:true,capture:true})}
+else if(k==='learn')history.replaceState({k:'main'},'');
+addEventListener('popstate',e=>{const k=e.state&&e.state.k;
+if(k==='exit'){if(confirm('앱을 나가시겠습니까?')){history.back();setTimeout(()=>{try{window.close()}catch(_){}},150)}else history.go(1);return}
+if(k==='learn')return;
+if(learnPushed){learnPushed=false;
+if(!skipFS&&document.fullscreenElement){try{document.exitFullscreen()}catch(_){};learnPushed=true;history.go(1);return}
+skipFS=false;home()}})})();
 
 sb.auth.getSession().then(({data})=>data.session?enter():login());
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script></body></html>
